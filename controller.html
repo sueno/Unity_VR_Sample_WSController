@@ -2,22 +2,38 @@
   <head> 
   <meta charset="UTF-8" /> 
   <title>UnityVRController</title>
+
+  <link href="css/overlay.css" rel="stylesheet"/>
+
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+  <script src="js/jquery.cookie.js"></script>
   <script src="js/socket.io.min.js"></script>
   <script type="text/javascript">
 
-var wsurl = 'ws://192.168.0.4:11000/test';
+var default_wsurl = 'ws://192.168.0.4:11000/test';
+
+
+// クッキーの設定（有効期限30日）
+if ($.cookie('ws-host')===undefined) {
+  $.cookie('ws-host','ws://192.168.0.4', {expires:30});
+  $.cookie('ws-port', '11000', {expires:30});
+  $.cookie('ws-path', 'test', {expires:30});
+  $.cookie('hand', 'right', {expires:30});
+  $.cookie('drag', 'move', {expires:30});
+  $.cookie('2tap', '', {expires:30});
+}
+
 
 // 画面がタッチされた時のイベントを取得
 window.addEventListener('touchstart', function(event){
-  event.preventDefault();
   _sendMessage("Dstart",event.pageX,event.pageY);
   sendMessage("Dstart",event.pageX,event.pageY);
 }, true);
 // ドラッグ時のイベントを取得
 window.addEventListener('touchmove', function(event){
-  _sendMessage("move",event.pageX,event.pageY);
-  sendMessage("move",event.pageX,event.pageY);
+  event.preventDefault();
+  _sendMessage($.cookie('drag'),event.pageX,event.pageY);
+  sendMessage($.cookie('drag'),event.pageX,event.pageY);
 }, true);
 // タッチ終了時のイベントを取得
 window.addEventListener('touchend', function(event){
@@ -36,15 +52,17 @@ window.addEventListener("deviceorientation", function(evt){
   var a = evt.alpha;
   var b = evt.beta;
   var g = evt.gamma;
-  var txt = "X : "+b+"<br>Y : "+a+"<br>Z : "+g+"<br>";
+  var txt = "Hand : "+$.cookie('hand')+"<br>X : "+b+"<br>Y : "+a+"<br>Z : "+g+"<br>";
   document.getElementById("sensor").innerHTML = txt;
-  sendRotation("R",b,a,g);
+  sendRotation($.cookie('hand'),b,a,g);
 }, true);
 
 
 
 // WebSocketサーバに接続
-var ws = new WebSocket(wsurl);
+var ws_url = $.cookie('ws-host')+':'+$.cookie('ws-port')+'/'+$.cookie('ws-path');
+//console.log(ws_url);
+var ws = new WebSocket(ws_url);
 
 // エラー処理
 ws.onerror = function(e){
@@ -95,10 +113,44 @@ function sendRotation(type, x, y, z) {
   }));
 }
 
+
+
+
+
+$(function() {
+  $("#ol-btn").click(function() {
+    $("#cookieList").html();
+    var htmlval = '<table align="center">';
+    $.each($.cookie(), function(key, value) {
+      htmlval += '<tr><td>'+key+'</td><td><input type="text" value="'+value+'" id="'+key+'"></input></tr>';
+    });
+    htmlval += '</table>';
+    $("#cookieList").html(htmlval);
+
+    $("#ol-div").fadeIn();
+  });
+
+  $("#okB").click(function() {
+    $.each($.cookie(), function(key, value) {
+      $.cookie(key, $("#"+key).val(), {expires:30});
+    });
+    $("#ol-div").fadeOut();
+  });
+  
+  $("#cancelB").click(function() {
+    $("#ol-div").fadeOut();
+  });
+
+});
+
+
+
+
 </script>
   </head>
 
   <body>
+    <br><br><br>
     <h1>UnityVRSample<br>websoket Controller</h1>
     <h2>
       <div>
@@ -114,5 +166,13 @@ function sendRotation(type, x, y, z) {
 	<div id="message"></div>
       </div>
     </h2>
+
+    <div id="ol-div">
+      <div id="cookieList">
+      </div>
+      <p id="okB" class="ol-cbtn">OK</p>
+      <p id="cancelB" class="ol-cbtn">CANCEL</p>
+    </div>
+    <div id="ol-btn">s</div>
   </body>
 </html>
