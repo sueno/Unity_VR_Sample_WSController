@@ -6,8 +6,45 @@
   <script src="js/socket.io.min.js"></script>
   <script type="text/javascript">
 
+var wsurl = 'ws://192.168.0.4:11000/test';
+
+// 画面がタッチされた時のイベントを取得
+window.addEventListener('touchstart', function(event){
+  event.preventDefault();
+  _sendMessage("Dstart",event.pageX,event.pageY);
+  sendMessage("Dstart",event.pageX,event.pageY);
+}, true);
+// ドラッグ時のイベントを取得
+window.addEventListener('touchmove', function(event){
+  _sendMessage("move",event.pageX,event.pageY);
+  sendMessage("move",event.pageX,event.pageY);
+}, true);
+// タッチ終了時のイベントを取得
+window.addEventListener('touchend', function(event){
+  _sendMessage("Dend",event.pageX,event.pageY);
+  sendMessage("Dend",event.pageX,event.pageY);
+}, true);
+
+// イベントの内容をページに表示
+function _sendMessage(message, x, y) {
+  var txt = message + " (" + x + ", " + y + ")"; 
+  document.getElementById("touch").innerHTML = txt;
+}
+
+// 傾きを取得
+window.addEventListener("deviceorientation", function(evt){
+  var a = evt.alpha;
+  var b = evt.beta;
+  var g = evt.gamma;
+  var txt = "X : "+b+"<br>Y : "+a+"<br>Z : "+g+"<br>";
+  document.getElementById("sensor").innerHTML = txt;
+  sendRotation("R",b,a,g);
+}, true);
+
+
+
 // WebSocketサーバに接続
-var ws = new WebSocket('ws://'+location.host+':11000/test');
+var ws = new WebSocket(wsurl);
 
 // エラー処理
 ws.onerror = function(e){
@@ -57,39 +94,6 @@ function sendRotation(type, x, y, z) {
     "z": ""+z
   }));
 }
-
-// 画面がタッチされた時のイベントを取得
-window.addEventListener('touchstart', function(event){
-  event.preventDefault();
-  _sendMessage("Dstart",event.pageX,event.pageY);
-  sendMessage("Dstart",event.pageX,event.pageY);
-}, true);
-// ドラッグ時のイベントを取得
-window.addEventListener('touchmove', function(event){
-  _sendMessage("move",event.pageX,event.pageY);
-  sendMessage("move",event.pageX,event.pageY);
-}, true);
-// タッチ終了時のイベントを取得
-window.addEventListener('touchend', function(event){
-  _sendMessage("Dend",event.pageX,event.pageY);
-  sendMessage("Dend",event.pageX,event.pageY);
-}, true);
-
-// イベントの内容をページに表示
-function _sendMessage(message, x, y) {
-  var txt = message + " (" + x + ", " + y + ")"; 
-  document.getElementById("touch").innerHTML = txt;
-}
-
-// 傾きを取得
-window.addEventListener("deviceorientation", function(evt){
-  var a = evt.alpha;
-  var b = evt.beta;
-  var g = evt.gamma;
-  var txt = "X : "+b+"<br>Y : "+a+"<br>Z : "+g+"<br>";
-  document.getElementById("sensor").innerHTML = txt;
-  sendRotation("R",b,a,g);
-}, true);
 
 </script>
   </head>
