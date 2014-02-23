@@ -8,6 +8,7 @@
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
   <script src="js/jquery.cookie.js"></script>
   <script src="js/socket.io.min.js"></script>
+  <script src="js/quo.js"></script>
   <script type="text/javascript">
 
 // クッキーの設定（有効期限30日）
@@ -17,9 +18,16 @@ if ($.cookie('ws-host')===undefined) {
   $.cookie('ws-path', 'test', {expires:30});
   $.cookie('hand', 'right', {expires:30});
   $.cookie('drag', 'move', {expires:30});
-  $.cookie('2tap', '' , {expires:30});
+  $.cookie('2tap', 'hold' , {expires:30});
 }
 
+// ダブルタップのイベントを取得
+$$(document).ready(function(){
+  $$("body").doubleTap(function(){
+    _sendMessage($.cookie('2tap'),"","");
+    sendMessage($.cookie('2tap'));
+  });
+});
 
 // 画面がタッチされた時のイベントを取得
 window.addEventListener('touchstart', function(event){
@@ -92,6 +100,12 @@ window.onbeforeunload = function () {
 };
 
 // メッセージ送信処理
+function sendMessage(type) {
+  ws.send(JSON.stringify({
+    "type": type,
+    "name": userName
+  }));
+}
 function sendMessage(type, x, y) {
   ws.send(JSON.stringify({
     "type": type,
