@@ -22,7 +22,7 @@
     position: fixed;
     top: 0;
     z-index: 100;
-    background: rgba(255,255,255,0.7);
+    background: rgba(255,255,255,0.8);
 }
 
 #ol-text{
@@ -37,10 +37,10 @@
     background: #eeeeee;
     color: #717171;
     width: 70px;
-    margin: auto;
+    margin: 10px;
     text-align: center;
     font-size: 15px;
-    padding:5px 0 5px 10px;
-    border-radius: 3px;
+    padding: 5px;
+    border-radius: 5px;
     cursor: pointer;
 }

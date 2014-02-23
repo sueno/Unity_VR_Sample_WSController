@@ -10,9 +10,6 @@
   <script src="js/socket.io.min.js"></script>
   <script type="text/javascript">
 
-var default_wsurl = 'ws://192.168.0.4:11000/test';
-
-
 // クッキーの設定（有効期限30日）
 if ($.cookie('ws-host')===undefined) {
   $.cookie('ws-host','ws://192.168.0.4', {expires:30});
@@ -20,7 +17,7 @@ if ($.cookie('ws-host')===undefined) {
   $.cookie('ws-path', 'test', {expires:30});
   $.cookie('hand', 'right', {expires:30});
   $.cookie('drag', 'move', {expires:30});
-  $.cookie('2tap', '', {expires:30});
+  $.cookie('2tap', '' , {expires:30});
 }
 
 
@@ -94,7 +91,7 @@ window.onbeforeunload = function () {
   }));
 };
 
-// メッセージ送信
+// メッセージ送信処理
 function sendMessage(type, x, y) {
   ws.send(JSON.stringify({
     "type": type,
@@ -116,8 +113,10 @@ function sendRotation(type, x, y, z) {
 
 
 
-
+// 設定画面イベント処理
 $(function() {
+
+  // ol-btnが押されたとき，設定画面を表示する
   $("#ol-btn").click(function() {
     $("#cookieList").html();
     var htmlval = '<table align="center">';
@@ -130,6 +129,7 @@ $(function() {
     $("#ol-div").fadeIn();
   });
 
+  // okB が押されたとき，設定を保存し，設定画面を閉じる．
   $("#okB").click(function() {
     $.each($.cookie(), function(key, value) {
       $.cookie(key, $("#"+key).val(), {expires:30});
@@ -137,6 +137,7 @@ $(function() {
     $("#ol-div").fadeOut();
   });
   
+  // canselB が押されたとき，設定画面を閉じる．
   $("#cancelB").click(function() {
     $("#ol-div").fadeOut();
   });
@@ -170,8 +171,8 @@ $(function() {
     <div id="ol-div">
       <div id="cookieList">
       </div>
-      <p id="okB" class="ol-cbtn">OK</p>
-      <p id="cancelB" class="ol-cbtn">CANCEL</p>
+      <b id="okB" class="ol-cbtn">OK</b>
+      <b id="cancelB" class="ol-cbtn">CANCEL</b>
     </div>
     <div id="ol-btn">s</div>
   </body>
