@@ -1,0 +1,118 @@
+<html> 
+  <head> 
+  <meta charset="UTF-8" /> 
+  <title>UnityVRController</title>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+  <script src="js/socket.io.min.js"></script>
+  <script type="text/javascript">
+
+var wsurl = 'ws://192.168.0.4:11000/test';
+
+// 画面がタッチされた時のイベントを取得
+window.addEventListener('touchstart', function(event){
+  event.preventDefault();
+  _sendMessage("Dstart",event.pageX,event.pageY);
+  sendMessage("Dstart",event.pageX,event.pageY);
+}, true);
+// ドラッグ時のイベントを取得
+window.addEventListener('touchmove', function(event){
+  _sendMessage("move",event.pageX,event.pageY);
+  sendMessage("move",event.pageX,event.pageY);
+}, true);
+// タッチ終了時のイベントを取得
+window.addEventListener('touchend', function(event){
+  _sendMessage("Dend",event.pageX,event.pageY);
+  sendMessage("Dend",event.pageX,event.pageY);
+}, true);
+
+// イベントの内容をページに表示
+function _sendMessage(message, x, y) {
+  var txt = message + " (" + x + ", " + y + ")"; 
+  document.getElementById("touch").innerHTML = txt;
+}
+
+// 傾きを取得
+window.addEventListener("deviceorientation", function(evt){
+  var a = evt.alpha;
+  var b = evt.beta;
+  var g = evt.gamma;
+  var txt = "X : "+b+"<br>Y : "+a+"<br>Z : "+g+"<br>";
+  document.getElementById("sensor").innerHTML = txt;
+  sendRotation("R",b,a,g);
+}, true);
+
+
+
+// WebSocketサーバに接続
+var ws = new WebSocket(wsurl);
+
+// エラー処理
+ws.onerror = function(e){
+}
+ 
+// ユーザ名をランダムに生成
+var userName = "user" + Math.floor(Math.random() * 100);
+ 
+// WebSocketサーバ接続イベント
+ws.onopen = function() {
+  ws.send(JSON.stringify({
+    type: "regist",
+    user: userName
+  }));
+};
+ 
+// メッセージ受信イベントを処理
+ws.onmessage = function(event) {
+  // 受信したメッセージを復元
+  var data = JSON.parse(event.data);
+  $("#message").html(data);
+};
+ 
+// ブラウザ終了イベント
+window.onbeforeunload = function () {
+  ws.send(JSON.stringify({
+    type: 'defect',
+    user: userName,
+  }));
+};
+
+// メッセージ送信
+function sendMessage(type, x, y) {
+  ws.send(JSON.stringify({
+    "type": type,
+    "name": userName,
+    "x": ""+x,
+    "y": ""+y
+  }));
+}
+function sendRotation(type, x, y, z) {
+  ws.send(JSON.stringify({
+    "type": type,
+    "name": userName,
+    "x": ""+x,
+    "y": ""+y,
+    "z": ""+z
+  }));
+}
+
+</script>
+  </head>
+
+  <body>
+    <h1>UnityVRSample<br>websoket Controller</h1>
+    <h1>
+      <div>
+	<p>Orientation</p>
+	<div id="sensor"></div>
+      </div>
+      <div>
+	<p>TouchEvent</p>
+	<div id="touch"></div>
+      </div>
+      <div>
+	<p>ServerMessage</p>
+	<div id="message"></div>
+      </div>
+    </h1>
+  </body>
+</html>
