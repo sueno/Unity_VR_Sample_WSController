@@ -149,13 +149,6 @@ $(function() {
       $.cookie(key, $("#"+key).val(), {expires:30});
     });
     $("#ol-div").fadeOut();
-
-    if ($.cookie("hand")==="right" || $.cookie("hand")==="R") {
-      console.log("Right");
-      $("#tutorialImg").attr("src","img/tutorial01.png");
-    } else {
-      $("#tutorialImg").attr("src","img/tutorial02.png");
-    }
   });
   
   // canselB が押されたとき，設定画面を閉じる．
@@ -166,6 +159,14 @@ $(function() {
 });
 
 
+$(document).ready(function(){
+    if ($.cookie("hand")==="right" || $.cookie("hand")==="R") {
+      console.log("Right");
+      $("#tutorialImg").attr("src","img/tutorial01.png");
+    } else {
+      $("#tutorialImg").attr("src","img/tutorial02.png");
+    }
+});
 
 
 </script>
