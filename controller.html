@@ -1,4 +1,4 @@
-<html> 
+﻿<html> 
   <head> 
   <meta charset="UTF-8" /> 
   <title>UnityVRController</title>
@@ -43,7 +43,9 @@ window.addEventListener('touchmove', function(event){
 // タッチ終了時のイベントを取得
 window.addEventListener('touchend', function(event){
   _sendMessage("Dend",event.pageX,event.pageY);
-  sendMessage("Dend",event.pageX,event.pageY);
+  sendMessage("Dend", event.pageX, event.pageY);
+
+  navigator.notification.vibrate(1000);
 }, true);
 
 // イベントの内容をページに表示
